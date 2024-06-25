@@ -941,33 +941,54 @@ func (s *sessionImpl) ListenAndHandleHTTP(ctx context.Context, cfg config.Tunnel
 func (s *sessionImpl) ProtoVersion() string {
 	return s.inner().ProtoVersion
 }
+
 func (s *sessionImpl) ServerVersion() string {
 	return s.inner().ServerVersion
 }
+
 func (s *sessionImpl) ClientID() string {
 	return s.inner().ClientID
 }
+
 func (s *sessionImpl) AccountName() string {
 	return s.inner().AccountName
 }
+
 func (s *sessionImpl) PlanName() string {
 	return s.inner().PlanName
 }
+
 func (s *sessionImpl) Banner() string {
 	return s.inner().Banner
 }
+
 func (s *sessionImpl) SessionDuration() int64 {
 	return s.inner().SessionDuration
 }
+
 func (s *sessionImpl) Region() string {
 	return s.inner().Region
 }
+
+// SrvInfo fetches the region from the server.
+// This can be used to validate a connection is functioning, and notably is one
+// of the few remote RPCs that does not require authentication to call.
+func (s *sessionImpl) SrvInfo() (string, error) {
+	info, err := s.inner().SrvInfo()
+	if err != nil {
+		return "", err
+	}
+	return info.Region, nil
+}
+
 func (s *sessionImpl) Heartbeat() (time.Duration, error) {
 	return s.inner().Heartbeat()
 }
+
 func (s *sessionImpl) Latency() <-chan time.Duration {
 	return s.inner().Latency()
 }
+
 func (s *sessionImpl) ConnectAddresses() []struct{ Region, ServerAddr string } {
 	connectAddresses := make([]struct{ Region, ServerAddr string }, len(s.inner().ConnectAddresses))
 	for i, addr := range s.inner().ConnectAddresses {
