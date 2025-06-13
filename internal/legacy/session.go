@@ -35,6 +35,7 @@ var libraryAgentVersion string
 // Session encapsulates an established session with the ngrok service. Sessions
 // recover from network failures by automatically reconnecting.
 type Session interface {
+	ID() string
 	// Listen creates a new Tunnel which will listen for new inbound
 	// connections. The returned Tunnel object is a net.Listener.
 	Listen(ctx context.Context, cfg config.Tunnel) (Tunnel, error)
@@ -552,6 +553,7 @@ func Connect(ctx context.Context, opts ...ConnectOption) (Session, error) {
 
 		sessionInner := &sessionInner{
 			Session:            sess,
+			ID:                 resp.SessionID,
 			Region:             resp.Extra.Region,
 			ProtoVersion:       resp.Version,
 			ServerVersion:      resp.Extra.Version,
@@ -689,6 +691,7 @@ type sessionImpl struct {
 type sessionInner struct {
 	tunnel_client.Session
 
+	ID                 string
 	Region             string
 	ProtoVersion       string
 	ServerVersion      string
@@ -717,6 +720,10 @@ func (s *sessionImpl) closeTunnel(clientID string, err error) error {
 
 func (s *sessionImpl) Close() error {
 	return s.inner().Close()
+}
+
+func (s *sessionImpl) ID() string {
+	return s.inner().ID
 }
 
 func (s *sessionImpl) Warnings() []error {

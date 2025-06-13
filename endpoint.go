@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"net/url"
 	"sync"
+
+	"golang.ngrok.com/ngrok/v2/internal/legacy"
 )
 
 // Endpoint is the interface implemented by both EndpointListener and
@@ -57,7 +59,7 @@ type baseEndpoint struct {
 	poolingEnabled bool
 	bindings       []string
 	description    string
-	id             string
+	tunnel         legacy.Tunnel
 	metadata       string
 	agentTLSConfig *tls.Config // TLS config for termination
 	trafficPolicy  string
@@ -87,7 +89,7 @@ func (e *baseEndpoint) Done() <-chan struct{} {
 }
 
 func (e *baseEndpoint) ID() string {
-	return e.id
+	return e.tunnel.EndpointID()
 }
 
 func (e *baseEndpoint) Metadata() string {

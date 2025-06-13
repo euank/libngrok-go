@@ -45,8 +45,9 @@ type SessionHandler interface {
 // Client sessions run over a muxado session.
 type rawSession struct {
 	mux        *muxado.Heartbeat // the muxado session we're multiplexing streams over
-	id         string            // session id for logging purposes
-	handler    SessionHandler    // callbacks to allow the application to handle requests from the server
+	sessionID  string
+	id         string         // session id for logging purposes
+	handler    SessionHandler // callbacks to allow the application to handle requests from the server
 	latency    chan time.Duration
 	closed     bool
 	closedLock sync.RWMutex
@@ -82,6 +83,7 @@ func (s *rawSession) Auth(id string, extra proto.AuthExtra) (resp proto.AuthResp
 		return
 	}
 
+	s.sessionID = resp.SessionID
 	// set client id / log tag only if it changed
 	if s.id != resp.ClientID {
 		s.id = resp.ClientID

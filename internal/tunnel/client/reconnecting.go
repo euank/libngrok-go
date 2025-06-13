@@ -412,6 +412,8 @@ func (s *reconnectingSession) reconnectTunnelToSession(raw RawSession, t *tunnel
 		return err
 	}
 	respErr := resp.Error
+	t.tunnelID.Store(&resp.TunnelID)
+	t.endpointID.Store(&resp.EndpointID)
 
 	newTunnels[oldID] = t
 

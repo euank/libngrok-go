@@ -151,6 +151,7 @@ func (a *agent) Connect(ctx context.Context) error {
 	// Create our AgentSession wrapper
 	a.sess = sess
 	a.agentSession = &agentSession{
+		id:        sess.ID(),
 		warnings:  sess.Warnings(),
 		agent:     a,
 		startedAt: time.Now(),
@@ -249,7 +250,7 @@ func (a *agent) createListener(ctx context.Context, endpointOpts *endpointOpts) 
 	endpoint := &endpointListener{
 		baseEndpoint: baseEndpoint{
 			agent:          a,
-			id:             tunnel.ID(),
+			tunnel:         tunnel,
 			poolingEnabled: endpointOpts.poolingEnabled,
 			bindings:       endpointOpts.bindings,
 			description:    endpointOpts.description,

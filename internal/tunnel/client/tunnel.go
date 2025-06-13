@@ -28,7 +28,9 @@ type ProxyConn struct {
 // A Tunnel is a net.Listener that Accept()'s connections from a
 // remote machine.
 type tunnel struct {
-	id            atomic.Value
+	id            *atomic.Pointer[string]
+	endpointID    *atomic.Pointer[string]
+	tunnelID      *atomic.Pointer[string]
 	configProto   string
 	url           string
 	opts          any
@@ -46,10 +48,14 @@ type tunnel struct {
 }
 
 func newTunnel(resp proto.BindResp, extra proto.BindExtra, s *session, forwardsTo string, forwardsProto string) *tunnel {
-	id := atomic.Value{}
-	id.Store(resp.ClientID)
+	var id, tunnelID, endpointID atomic.Pointer[string]
+	id.Store(&resp.ClientID)
+	tunnelID.Store(&resp.TunnelID)
+	endpointID.Store(&resp.EndpointID)
 	return &tunnel{
-		id:            id,
+		id:            &id,
+		tunnelID:      &tunnelID,
+		endpointID:    &endpointID,
 		configProto:   resp.Proto,
 		url:           resp.URL,
 		opts:          resp.Opts,
@@ -117,11 +123,23 @@ func (t *tunnel) ForwardsTo() string {
 }
 
 func (t *tunnel) ID() string {
-	return t.id.Load().(string)
+	if id := t.id.Load(); id != nil {
+		return *id
+	}
+	return ""
 }
 
 func (t *tunnel) EndpointID() string {
-	// For now, return empty string as placeholder until we implement the full EndpointID plumbing
+	if id := t.endpointID.Load(); id != nil {
+		return *id
+	}
+	return ""
+}
+
+func (t *tunnel) TunnelID() string {
+	if id := t.tunnelID.Load(); id != nil {
+		return *id
+	}
 	return ""
 }
 
