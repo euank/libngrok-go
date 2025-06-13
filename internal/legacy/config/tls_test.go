@@ -9,10 +9,9 @@ import (
 func TestTLS(t *testing.T) {
 	cases := testCases[*tlsOptions, proto.TLSEndpoint]{
 		{
-			name:         "basic",
-			opts:         TLSEndpoint(),
-			expectProto:  ptr("tls"),
-			expectLabels: nil,
+			name:        "basic",
+			opts:        TLSEndpoint(),
+			expectProto: ptr("tls"),
 		},
 	}
 

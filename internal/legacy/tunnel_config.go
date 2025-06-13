@@ -17,7 +17,6 @@ type tunnelConfigPrivate interface {
 	Extra() proto.BindExtra
 	Proto() string
 	Opts() any
-	Labels() map[string]string
 	// Extra config when auto-forwarding to a URL.
 	// Normal operation should use the functional builder.
 	WithForwardsTo(*url.URL)

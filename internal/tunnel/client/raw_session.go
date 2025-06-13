@@ -19,7 +19,6 @@ import (
 type RawSession interface {
 	Auth(id string, extra proto.AuthExtra) (proto.AuthResp, error)
 	Listen(proto string, opts any, extra proto.BindExtra, id string, forwardsTo string, forwardsProto string) (proto.BindResp, error)
-	ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (proto.StartTunnelWithLabelResp, error)
 	Unlisten(id string) (proto.UnbindResp, error)
 	Accept() (netx.LoggedConn, error)
 
@@ -116,17 +115,6 @@ func (s *rawSession) Listen(protocol string, opts any, extra proto.BindExtra, id
 	return
 }
 
-// ListenLabel sends a listen message to the server and returns the server's response
-func (s *rawSession) ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (resp proto.StartTunnelWithLabelResp, err error) {
-	req := proto.StartTunnelWithLabel{
-		Labels:        labels,
-		Metadata:      metadata,
-		ForwardsTo:    forwardsTo,
-		ForwardsProto: forwardsProto,
-	}
-	err = s.rpc(proto.StartTunnelWithLabelReq, &req, &resp)
-	return
-}
 
 // Unlisten sends an unlisten message to the server and returns the server's
 // response. id is the bind id returned as part of the BindResp from a Listen

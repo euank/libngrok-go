@@ -46,12 +46,6 @@ func (s *swapRaw) Listen(protocol string, opts any, extra proto.BindExtra, id st
 	return proto.BindResp{}, ErrSessionNotReady
 }
 
-func (s *swapRaw) ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (resp proto.StartTunnelWithLabelResp, err error) {
-	if raw := s.get(); raw != nil {
-		return raw.ListenLabel(labels, metadata, forwardsTo, forwardsProto)
-	}
-	return proto.StartTunnelWithLabelResp{}, ErrSessionNotReady
-}
 
 func (s *swapRaw) Unlisten(url string) (resp proto.UnbindResp, err error) {
 	if raw := s.get(); raw != nil {
@@ -188,11 +182,6 @@ func (s *reconnectingSession) Listen(protocol string, opts any, extra proto.Bind
 	})
 }
 
-func (s *reconnectingSession) ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (Tunnel, error) {
-	return s.listenTunnel(func(session *session) (Tunnel, error) {
-		return session.ListenLabel(labels, metadata, forwardsTo, forwardsProto)
-	})
-}
 
 func (s *reconnectingSession) listenTunnel(listen func(*session) (Tunnel, error)) (Tunnel, error) {
 	if sess := s.firstSession(); sess != nil {
@@ -418,28 +407,13 @@ func (s *reconnectingSession) reconnectTunnelToSession(raw RawSession, t *tunnel
 	tCfg := t.RemoteBindConfig()
 	t.bindExtra.Token = tCfg.Token
 
-	var respErr string
-	if tCfg.Labels != nil {
-		resp, err := raw.ListenLabel(tCfg.Labels, tCfg.Metadata, t.ForwardsTo(), t.ForwardsProto())
-		if err != nil {
-			return err
-		}
-		respErr = resp.Error
-		if resp.ID != "" {
-			t.id.Store(resp.ID)
-			newTunnels[resp.ID] = t
-		} else {
-			newTunnels[oldID] = t
-		}
-	} else {
-		resp, err := raw.Listen(tCfg.ConfigProto, tCfg.Opts, t.bindExtra, t.ID(), t.ForwardsTo(), t.ForwardsProto())
-		if err != nil {
-			return err
-		}
-		respErr = resp.Error
-
-		newTunnels[oldID] = t
+	resp, err := raw.Listen(tCfg.ConfigProto, tCfg.Opts, t.bindExtra, t.ID(), t.ForwardsTo(), t.ForwardsProto())
+	if err != nil {
+		return err
 	}
+	respErr := resp.Error
+
+	newTunnels[oldID] = t
 
 	if respErr != "" {
 		return errors.New(respErr)

@@ -48,7 +48,6 @@ type testCase[T tunnelConfigPrivate, O any] struct {
 	expectForwardsTo *string
 	expectProto      *string
 	expectExtra      *matchBindExtra
-	expectLabels     *map[string]*string
 	expectOpts       func(t *testing.T, opts *O)
 	expectNilOpts    bool
 }
@@ -67,18 +66,6 @@ func (tc testCase[T, O]) Run(t *testing.T) {
 		}
 		if tc.expectExtra != nil {
 			tc.expectExtra.RequireMatches(t, actualOpts.Extra())
-		}
-		if tc.expectLabels != nil {
-			if *tc.expectLabels != nil {
-				actual := actualOpts.Labels()
-				require.Len(t, actual, len(*tc.expectLabels))
-				for k, v := range *tc.expectLabels {
-					require.Contains(t, actual, k)
-					require.Equal(t, *v, actual[k])
-				}
-			} else {
-				require.Nil(t, actualOpts.Labels())
-			}
 		}
 		if tc.expectNilOpts {
 			require.Nil(t, actualOpts.Opts())

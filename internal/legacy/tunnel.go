@@ -44,9 +44,8 @@ type TunnelInfo interface {
 	ForwardsTo() string
 	// ID returns a tunnel's unique ID.
 	ID() string
-	// Labels returns the labels set by config.WithLabel if this is a
-	// labeled tunnel. Non-labeled tunnels will return an empty map.
-	Labels() map[string]string
+	// EndpointID returns the endpoint ID associated with this
+	EndpointID() string
 	// Metadata returns the arbitrary metadata string for this tunnel.
 	Metadata() string
 	// Proto returns the protocol of the tunnel's endpoint.
@@ -125,8 +124,8 @@ func (t *tunnelImpl) ID() string {
 	return t.Tunnel.ID()
 }
 
-func (t *tunnelImpl) Labels() map[string]string {
-	return t.Tunnel.RemoteBindConfig().Labels
+func (t *tunnelImpl) EndpointID() string {
+	return t.Tunnel.EndpointID()
 }
 
 func (t *tunnelImpl) Session() Session {

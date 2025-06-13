@@ -11,20 +11,18 @@ import (
 func TestTCP(t *testing.T) {
 	cases := testCases[*tcpOptions, proto.TCPEndpoint]{
 		{
-			name:         "empty",
-			opts:         TCPEndpoint(),
-			expectProto:  ptr("tcp"),
-			expectLabels: nil,
+			name:        "empty",
+			opts:        TCPEndpoint(),
+			expectProto: ptr("tcp"),
 			expectOpts: func(t *testing.T, opts *proto.TCPEndpoint) {
 				require.NotNil(t, opts)
 				require.Empty(t, opts.Addr)
 			},
 		},
 		{
-			name:         "remote addr",
-			opts:         TCPEndpoint(WithURL("tcp://0.tcp.ngrok.io:1234")),
-			expectProto:  ptr("tcp"),
-			expectLabels: nil,
+			name:        "remote addr",
+			opts:        TCPEndpoint(WithURL("tcp://0.tcp.ngrok.io:1234")),
+			expectProto: ptr("tcp"),
 			expectOpts: func(t *testing.T, opts *proto.TCPEndpoint) {
 				require.NotNil(t, opts)
 				require.Equal(t, "tcp://0.tcp.ngrok.io:1234", opts.URL)

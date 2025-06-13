@@ -76,9 +76,6 @@ func (cfg tcpOptions) Opts() any {
 	return cfg.toProtoConfig()
 }
 
-func (cfg tcpOptions) Labels() map[string]string {
-	return nil
-}
 
 func (cfg tcpOptions) HTTPServer() *http.Server {
 	return cfg.httpServer

@@ -39,10 +39,6 @@ type Session interface {
 	// ListenHTTP, ListenTCP, etc.
 	Listen(protocol string, opts any, extra proto.BindExtra, forwardsTo string, forwardsProto string) (Tunnel, error)
 
-	// Listen negotiates with the server to create a new remote listen for the
-	// given labels. It returns a *Tunnel on success from which the caller can
-	// accept new connections over the listen.
-	ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (Tunnel, error)
 
 	// Convenience methods
 
@@ -137,25 +133,6 @@ func (s *session) Listen(protocol string, opts any, extra proto.BindExtra, forwa
 	return t, nil
 }
 
-func (s *session) ListenLabel(labels map[string]string, metadata string, forwardsTo string, forwardsProto string) (Tunnel, error) {
-	resp, err := s.raw.ListenLabel(labels, metadata, forwardsTo, forwardsProto)
-	if err != nil {
-		return nil, err
-	}
-
-	// process application-level error
-	if resp.Error != "" {
-		return nil, proto.StringError(resp.Error)
-	}
-
-	// make tunnel
-	t := newTunnelLabel(resp, metadata, labels, s, forwardsTo, forwardsProto)
-
-	// add to tunnel registry
-	s.addTunnel(resp.ID, t)
-
-	return t, nil
-}
 
 func (s *session) ListenHTTP(opts *proto.HTTPEndpoint, extra proto.BindExtra, forwardsTo string, forwardsProto string) (Tunnel, error) {
 	return s.Listen("http", opts, extra, forwardsTo, forwardsProto)

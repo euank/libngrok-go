@@ -90,9 +90,6 @@ func (cfg httpOptions) Opts() any {
 	return cfg.toProtoConfig()
 }
 
-func (cfg httpOptions) Labels() map[string]string {
-	return nil
-}
 
 func (cfg httpOptions) HTTPServer() *http.Server {
 	return cfg.httpServer

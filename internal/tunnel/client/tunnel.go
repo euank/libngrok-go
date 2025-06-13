@@ -15,6 +15,7 @@ type Tunnel interface {
 	Close() error
 	RemoteBindConfig() *RemoteBindConfig
 	ID() string
+	EndpointID() string
 	ForwardsTo() string
 	ForwardsProto() string
 }
@@ -62,22 +63,6 @@ func newTunnel(resp proto.BindResp, extra proto.BindExtra, s *session, forwardsT
 	}
 }
 
-func newTunnelLabel(resp proto.StartTunnelWithLabelResp, metadata string, labels map[string]string, s *session, forwardsTo string, forwardsProto string) *tunnel {
-	id := atomic.Value{}
-	id.Store(resp.ID)
-	return &tunnel{
-		id: id,
-		bindExtra: proto.BindExtra{
-			Metadata: metadata,
-		}, // this makes the reconnecting session a little easier
-		labels:        labels,
-		accept:        make(chan *ProxyConn),
-		unlisten:      func() error { return s.unlisten(resp.ID) },
-		forwardsTo:    forwardsTo,
-		forwardsProto: forwardsProto,
-		closeError:    errors.New("Listener closed"),
-	}
-}
 
 func (t *tunnel) handleConn(r *ProxyConn) {
 	t.shut.Do(func() {
@@ -133,6 +118,11 @@ func (t *tunnel) ForwardsTo() string {
 
 func (t *tunnel) ID() string {
 	return t.id.Load().(string)
+}
+
+func (t *tunnel) EndpointID() string {
+	// For now, return empty string as placeholder until we implement the full EndpointID plumbing
+	return ""
 }
 
 // RemoteBindConfig returns more detailed information about the public endpoint of the

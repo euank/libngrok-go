@@ -11,10 +11,9 @@ import (
 func TestHTTP(t *testing.T) {
 	cases := testCases[*httpOptions, proto.HTTPEndpoint]{
 		{
-			name:         "empty",
-			opts:         HTTPEndpoint(),
-			expectProto:  ptr("https"),
-			expectLabels: nil,
+			name:        "empty",
+			opts:        HTTPEndpoint(),
+			expectProto: ptr("https"),
 			expectOpts: func(t *testing.T, opts *proto.HTTPEndpoint) {
 				require.NotNil(t, opts)
 			},

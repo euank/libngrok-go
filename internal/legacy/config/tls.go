@@ -97,9 +97,6 @@ func (cfg tlsOptions) Opts() any {
 	return cfg.toProtoConfig()
 }
 
-func (cfg tlsOptions) Labels() map[string]string {
-	return nil
-}
 
 func (cfg tlsOptions) HTTPServer() *http.Server {
 	return cfg.httpServer
